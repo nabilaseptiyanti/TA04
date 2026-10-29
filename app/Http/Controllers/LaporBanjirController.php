@@ -7,29 +7,31 @@ use App\Models\Laporan;
 
 class LaporBanjirController extends Controller
 {
-    public function simpan(Request $request)
+    public function create()
     {
+        return view('laporan.create');
+    }
 
-        $request->validate([
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
             'nama_pelapor' => 'required|string|max:255',
             'lokasi' => 'required|string|max:255',
-            'tinggi_genangan' => 'required|integer',
+            'tinggi_genangan' => 'required|integer|min:0',
             'tanggal_kejadian' => 'required|date',
         ]);
 
-        Laporan::create([
-            'nama_pelapor' => $request->nama_pelapor,
-            'lokasi' => $request->lokasi,
-            'tinggi_genangan' => $request->tinggi_genangan,
-            'tanggal_kejadian' => $request->tanggal_kejadian,
-        ]);
+        Laporan::create($validated);
 
-        return view('konfirmasi')->with('success', 'Laporan banjir berhasil dikirim dan disimpan!');
+        return redirect()
+            ->route('laporan.create')
+            ->with('success', 'Laporan banjir berhasil dikirim dan disimpan!');
     }
 
-    public function daftar()
+    public function index()
     {
-        $laporan = Laporan::all();
-        return view('daftar-laporan', compact('laporan'));
+        $laporan = Laporan::latest()->get();
+
+        return view('laporan.index', compact('laporan'));
     }
 }
